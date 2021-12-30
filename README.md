@@ -2,6 +2,22 @@
 
 [Nonebot2](https://github.com/nonebot/nonebot2) 插件，用于 PornHub 等风格logo制作
 
+
+### 安装
+
+- 使用 nb-cli
+
+```
+nb plugin install nonebot_plugin_logo
+```
+
+- 使用 pip
+
+```
+pip install nonebot_plugin_logo
+```
+
+
 ### 使用
 
 目前支持的风格：
