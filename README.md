@@ -62,6 +62,16 @@ pip install nonebot_plugin_logo
   <img src="./examples/4.gif" />
 </div>
 
+ - 谷歌
+
+指令：`google/gglogo {text}`
+
+示例：`google Google`
+
+<div align="left">
+  <img src="./examples/5.png" />
+</div>
+
 
 ### 特别感谢
 
