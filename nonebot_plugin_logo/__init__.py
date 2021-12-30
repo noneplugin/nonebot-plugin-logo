@@ -15,6 +15,7 @@ pornhub：ph {text1} {text2}
 youtube：yt {text1} {text2}
 5000兆円欲しい!：5000兆 {text1} {text2}
 抖音：douyin {text}
+谷歌：google {text}
 '''.strip()
 __short_cmd__ = 'ph、yt、5000兆、douyin'
 __example__ = '''

@@ -22,6 +22,7 @@ pb_tpl = get_tpl('pornhub.html')
 yt_tpl = get_tpl('youtube.html')
 cy_tpl = get_tpl('5000choyen.html')
 dy_tpl = get_tpl('douyin.html')
+gg_tpl = get_tpl('google.html')
 
 
 async def create_pornhub_logo(left_text, right_text) -> bytes:
@@ -60,6 +61,11 @@ async def create_douyin_logo(text) -> BytesIO:
     return output
 
 
+async def create_google_logo(text) -> BytesIO:
+    html = await gg_tpl.render_async(text=text)
+    return await html_to_pic(html, wait=0, viewport={"width": 100, "height": 100})
+
+
 commands = {
     'pornhub': {
         'aliases': {'ph ', 'phlogo'},
@@ -79,6 +85,11 @@ commands = {
     'douyin': {
         'aliases': {'dylogo'},
         'func': create_douyin_logo,
+        'arg_num': 1
+    },
+    'google': {
+        'aliases': {'gglogo'},
+        'func': create_google_logo,
         'arg_num': 1
     }
 }
