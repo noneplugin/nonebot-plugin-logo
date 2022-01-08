@@ -1,5 +1,19 @@
 <html>
+  <head>
+    <style>
+      @font-face {
+        font-family: "Noto Sans SC";
+        src: local("Noto Sans SC"), url("./fonts/NotoSansSC-Regular.otf");
+      }
+      @font-face {
+        font-family: "Noto Serif SC";
+        src: local("Noto Serif SC"), url("./fonts/NotoSerifSC-Regular.otf");
+      }
+    </style>
+  </head>
   <body>
+    <div style="font-family: Noto Sans SC">.</div>
+    <div style="font-family: Noto Serif SC">.</div>
     <script>
       function TopText(ctx) {
         this.value = "";
@@ -199,6 +213,7 @@
         this.bottomText.draw();
         const a = document.createElement("a");
         a.href = this.canvas.toDataURL("image/png");
+        a.innerText = "result";
         document.body.appendChild(a);
       };
     </script>
@@ -206,8 +221,10 @@
       drawer = new Drawer();
       drawer.topText.value = "{{ top_text }}";
       drawer.bottomText.value = "{{ bottom_text }}";
-      drawer.refresh();
-      drawer.createImage();
+      setTimeout(function () {
+        drawer.refresh();
+        drawer.createImage();
+      }, 500);
     </script>
   </body>
 </html>

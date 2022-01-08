@@ -1,54 +1,58 @@
 import base64
 import jinja2
 import imageio
-import pkgutil
 import traceback
 from io import BytesIO
 from pathlib import Path
-from jinja2 import Template
 from typing import List, Union
 
 from nonebot.log import logger
 from nonebot_plugin_htmlrender import get_new_page, html_to_pic
 
-env = jinja2.Environment(enable_async=True)
+
+dir_path = Path(__file__).parent
+template_path = dir_path / 'templates'
+path_url = f"file://{template_path.absolute()}"
+env = jinja2.Environment(loader=jinja2.FileSystemLoader(template_path),
+                         enable_async=True)
 
 
-def get_tpl(name: str) -> Template:
-    return env.from_string(pkgutil.get_data(__name__, f"templates/{name}").decode())
-
-
-pb_tpl = get_tpl('pornhub.html')
-yt_tpl = get_tpl('youtube.html')
-cy_tpl = get_tpl('5000choyen.html')
-dy_tpl = get_tpl('douyin.html')
-gg_tpl = get_tpl('google.html')
+async def create_image(html: str):
+    return await html_to_pic(html, viewport={"width": 100, "height": 100},
+                             template_path=path_url)
 
 
 async def create_pornhub_logo(left_text, right_text) -> bytes:
-    html = await pb_tpl.render_async(left_text=left_text, right_text=right_text)
-    return await html_to_pic(html, wait=0, viewport={"width": 100, "height": 100})
+    template = env.get_template('pornhub.html')
+    html = await template.render_async(left_text=left_text, right_text=right_text)
+    return await create_image(html)
 
 
 async def create_youtube_logo(left_text, right_text) -> bytes:
-    html = await yt_tpl.render_async(left_text=left_text, right_text=right_text)
-    return await html_to_pic(html, wait=0, viewport={"width": 100, "height": 100})
+    template = env.get_template('youtube.html')
+    html = await template.render_async(left_text=left_text, right_text=right_text)
+    return await create_image(html)
 
 
 async def create_5000choyen_logo(top_text, bottom_text) -> str:
-    html = await cy_tpl.render_async(top_text=top_text, bottom_text=bottom_text)
+    template = env.get_template('5000choyen.html')
+    html = await template.render_async(top_text=top_text, bottom_text=bottom_text)
 
     async with get_new_page() as page:
+        await page.goto(path_url)
         await page.set_content(html)
+        await page.wait_for_selector('a')
         a = await page.query_selector('a')
         img = await (await a.get_property('href')).json_value()
     return 'base64://' + str(img).replace('data:image/png;base64,', '')
 
 
 async def create_douyin_logo(text) -> BytesIO:
-    html = await dy_tpl.render_async(text=text, frame_num=10)
+    template = env.get_template('douyin.html')
+    html = await template.render_async(text=text, frame_num=10)
 
     async with get_new_page() as page:
+        await page.goto(path_url)
         await page.set_content(html)
         imgs = await page.query_selector_all('a')
         imgs = [await (await img.get_property('href')).json_value() for img in imgs]
@@ -62,8 +66,9 @@ async def create_douyin_logo(text) -> BytesIO:
 
 
 async def create_google_logo(text) -> BytesIO:
-    html = await gg_tpl.render_async(text=text)
-    return await html_to_pic(html, wait=0, viewport={"width": 100, "height": 100})
+    template = env.get_template('google.html')
+    html = await template.render_async(text=text)
+    return await create_image(html)
 
 
 commands = {
