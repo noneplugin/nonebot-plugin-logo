@@ -2,11 +2,11 @@ import shlex
 from typing import Type
 from nonebot import on_command
 from nonebot.matcher import Matcher
-from nonebot.typing import T_Handler, T_State
-from nonebot.adapters.cqhttp import Bot, Event, MessageSegment
+from nonebot.typing import T_Handler
+from nonebot.params import CommandArg
+from nonebot.adapters.onebot.v11 import MessageSegment, Message
 
 from .data_source import create_logo, commands
-
 
 __help__plugin_name__ = 'logo'
 __des__ = 'pornhub等风格logo生成'
@@ -27,8 +27,8 @@ douyin douyin
 __usage__ = f'{__des__}\nUsage:\n{__cmd__}\nExample:\n{__example__}'
 
 
-async def handle(matcher: Type[Matcher], event: Event, style: str):
-    text = event.get_plaintext().strip()
+async def handle(matcher: Type[Matcher], args: Message, style: str):
+    text = args.extract_plain_text().strip()
     if not text:
         await matcher.finish()
 
@@ -45,15 +45,15 @@ async def handle(matcher: Type[Matcher], event: Event, style: str):
 
 
 def create_matchers():
-
     def create_handler(style: str) -> T_Handler:
-        async def handler(bot: Bot, event: Event, state: T_State):
-            await handle(matcher, event, style)
+        async def handler(args=CommandArg()):
+            await handle(matcher, args, style)
+
         return handler
 
     for style, params in commands.items():
         matcher = on_command(
-            style, aliases=params['aliases'], priority=13)
+            style, aliases=params['aliases'], priority=13, block=True)
         matcher.append_handler(create_handler(style))
 
 
