@@ -100,7 +100,7 @@ commands = {
 }
 
 
-async def create_logo(texts: List[str], style: str) -> Union[str, bytes, BytesIO, Path]:
+async def create_logo(style: str, texts: List[str]) -> Union[str, bytes, BytesIO, Path]:
     try:
         func = commands[style]['func']
         return await func(*texts)

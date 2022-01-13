@@ -1,5 +1,4 @@
 import shlex
-from typing import Type
 from nonebot import on_command
 from nonebot.matcher import Matcher
 from nonebot.typing import T_Handler
@@ -27,17 +26,13 @@ douyin douyin
 __usage__ = f'{__des__}\nUsage:\n{__cmd__}\nExample:\n{__example__}'
 
 
-async def handle(matcher: Type[Matcher], args: Message, style: str):
-    text = args.extract_plain_text().strip()
-    if not text:
-        await matcher.finish()
-
+async def handle(matcher: Matcher, style: str, text: str):
     arg_num = commands[style]['arg_num']
     texts = [text] if arg_num == 1 else shlex.split(text)
     if len(texts) != arg_num:
         await matcher.finish('参数数量不符')
 
-    image = await create_logo(texts, style)
+    image = await create_logo(style, texts)
     if image:
         await matcher.finish(MessageSegment.image(image))
     else:
@@ -46,14 +41,17 @@ async def handle(matcher: Type[Matcher], args: Message, style: str):
 
 def create_matchers():
     def create_handler(style: str) -> T_Handler:
-        async def handler(args=CommandArg()):
-            await handle(matcher, args, style)
+        async def handler(msg: Message = CommandArg()):
+            text = msg.extract_plain_text().strip()
+            if not text:
+                await matcher.finish()
+            await handle(matcher, style, text)
 
         return handler
 
     for style, params in commands.items():
-        matcher = on_command(
-            style, aliases=params['aliases'], priority=13, block=True)
+        matcher = on_command(style, aliases=params['aliases'],
+                             priority=13, block=True)
         matcher.append_handler(create_handler(style))
 
 
