@@ -10,10 +10,9 @@
         src: local("Noto Serif SC"), url("./fonts/NotoSerifSC-Regular.otf");
       }
     </style>
+    <script src="./fontfaceobserver.js"></script>
   </head>
   <body>
-    <div style="font-family: Noto Sans SC">.</div>
-    <div style="font-family: Noto Serif SC">.</div>
     <script>
       function TopText(ctx) {
         this.value = "";
@@ -23,10 +22,6 @@
         this.w = 0.0;
         this.ctx = ctx;
       }
-      TopText.prototype.init = function () {
-        this.ctx.font = this.font;
-        this.w = this.ctx.measureText(this.value).width;
-      };
       TopText.prototype.draw = function () {
         this.ctx.font = this.font;
         this.ctx.setTransform(1, 0, -0.45, 1, 0, 0);
@@ -101,6 +96,7 @@
           this.ctx.fillStyle = grad;
           this.ctx.fillText(this.value, this.x, this.y - 3);
         }
+        this.w = this.ctx.measureText(this.value).width + 30;
       };
 
       function BottomText(ctx) {
@@ -111,10 +107,6 @@
         this.w = 0.0;
         this.ctx = ctx;
       }
-      BottomText.prototype.init = function () {
-        this.ctx.font = this.font;
-        this.w = this.ctx.measureText(this.value).width - 40;
-      };
       BottomText.prototype.draw = function () {
         this.ctx.font = this.font;
         this.ctx.setTransform(1, 0, -0.45, 1, 0, 0);
@@ -181,50 +173,64 @@
           this.ctx.fillStyle = grad;
           this.ctx.fillText(this.value, this.x, this.y - 3);
         }
+        this.w = this.ctx.measureText(this.value).width - 40;
       };
 
-      function Drawer() {
-        this.canvas = document.createElement("canvas");
-        this.ctx = this.canvas.getContext("2d");
+      function Drawer(canvas) {
+        this.canvas = canvas;
+        this.ctx = canvas.getContext("2d");
         this.ctx.lineJoin = "round";
         this.ctx.lineCap = "round";
+        this.ctx.fillStyle = "white";
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
         this.topText = new TopText(this.ctx);
         this.bottomText = new BottomText(this.ctx);
       }
       Drawer.prototype.refresh = function () {
+        this.clear();
         this.topText.font = "100px 'Noto Sans SC'";
         this.bottomText.font = "100px 'Noto Serif SC'";
-        this.topText.init();
-        this.bottomText.init();
-        this.canvas.width = Math.max(
-          this.topText.x + this.topText.w,
-          this.bottomText.x + this.bottomText.w
-        );
-        this.canvas.height = 290;
-        this.clear();
+        this.topText.draw();
+        this.bottomText.draw();
       };
       Drawer.prototype.clear = function () {
         this.ctx.setTransform(1, 0, 0, 1, 0, 0);
         this.ctx.fillStyle = `white`;
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
       };
-      Drawer.prototype.createImage = function () {
-        this.topText.draw();
-        this.bottomText.draw();
+      Drawer.prototype.saveImage = function () {
+        const width = Math.max(
+          this.topText.x + this.topText.w,
+          this.bottomText.x + this.bottomText.w
+        );
+        const height = this.ctx.canvas.height;
+        const data = this.ctx.getImageData(0, 0, width, height);
+        const canvas = document.createElement("canvas");
+        canvas.width = data.width;
+        canvas.height = data.height;
+        const ctx = canvas.getContext("2d");
+        ctx.putImageData(data, 0, 0);
         const a = document.createElement("a");
-        a.href = this.canvas.toDataURL("image/png");
+        a.href = canvas.toDataURL("image/png");
         a.innerText = "result";
         document.body.appendChild(a);
       };
     </script>
     <script>
-      drawer = new Drawer();
+      const canvas = document.createElement("canvas");
+      canvas.width = 5000;
+      canvas.height = 290;
+      drawer = new Drawer(canvas);
       drawer.topText.value = "{{ top_text }}";
       drawer.bottomText.value = "{{ bottom_text }}";
-      setTimeout(function () {
-        drawer.refresh();
-        drawer.createImage();
-      }, 500);
+      var fontA = new FontFaceObserver("Noto Sans SC");
+      var fontB = new FontFaceObserver("Noto Serif SC");
+      Promise.all([fontA.load(), fontB.load()]).then(function () {
+        document.fonts.ready.then(function () {
+          drawer.refresh();
+          drawer.saveImage();
+        });
+      });
     </script>
   </body>
 </html>
