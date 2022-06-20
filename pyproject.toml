@@ -1,13 +1,16 @@
 [tool.poetry]
 name = "nonebot_plugin_logo"
-version = "0.2.1"
-description = "Nonebot2 plugin for making logo in PornHub or other styles"
+version = "0.2.2"
+description = "Nonebot2插件，用于制作 PornHub 等风格 logo"
 authors = ["meetwq <meetwq@gmail.com>"]
 license = "MIT"
+readme = "README.md"
+homepage = "https://github.com/noneplugin/nonebot-plugin-logo"
+repository = "https://github.com/noneplugin/nonebot-plugin-logo"
 
 [tool.poetry.dependencies]
 python = "^3.7.3"
-nonebot2 = "^2.0.0-beta.1"
+nonebot2 = "^2.0.0-beta.4"
 nonebot-adapter-onebot = "^2.0.0-beta.1"
 nonebot-plugin-htmlrender = ">=0.0.4.1"
 imageio = "^2.12.0"
@@ -15,6 +18,7 @@ Jinja2 = "^3.0.0"
 
 [tool.poetry.dev-dependencies]
 nb-cli = "^0.6.0"
+black = "^22.1.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
