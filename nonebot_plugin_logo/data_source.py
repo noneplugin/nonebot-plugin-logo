@@ -6,9 +6,6 @@ from pathlib import Path
 from dataclasses import dataclass
 from typing import List, Tuple, Union, Protocol
 
-from nonebot import require
-
-require("nonebot_plugin_htmlrender")
 from nonebot_plugin_htmlrender import get_new_page, html_to_pic
 
 
