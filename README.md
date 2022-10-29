@@ -3,6 +3,11 @@
 [Nonebot2](https://github.com/nonebot/nonebot2) 插件，用于 PornHub 等风格logo制作
 
 
+## ！！！注意
+
+本插件的大部分功能已由 [nonebot-plugin-memes](https://github.com/noneplugin/nonebot-plugin-memes) 插件实现，本项目将不再维护
+
+
 ### 安装
 
 - 使用 nb-cli
